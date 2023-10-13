@@ -164,7 +164,7 @@ class Fragment1 : Fragment() {
                             Log.d("TAGt", "collect LatestNewsUiState.Success size = ${it.news.size}")
                         }
                         is LatestNewsUiState.Error -> {
-                            Log.d("TAGt", "collect LatestNewsUiState.Error message = ${it.exception.message}")
+                            Log.d("TAGt", "collect111 LatestNewsUiState.Error message = ${it.exception.message}")
                             activity?.showErrorDialog(it.exception.message)
                         }
                     }
