@@ -1,8 +1,9 @@
-package com.example.yandexmaprufat.ui
+package com.example.yandexmaprufat.ui.vmfactories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.yandexmaprufat.db.MainRepository
+import com.example.yandexmaprufat.ui.MainViewModel
 
 
 class MainViewModelFactory(

@@ -2,7 +2,10 @@ package com.example.yandexmaprufat.db
 
 
 import android.util.Log
+import com.example.yandexmaprufat.data.Bank
+import com.example.yandexmaprufat.data.BankItemDto
 import com.example.yandexmaprufat.data.LatestNewsUiState
+import com.example.yandexmaprufat.data.mapFromBankListResponseDtoToBankList
 import com.example.yandexmaprufat.remote.Left
 import com.example.yandexmaprufat.remote.RemoteApi
 import com.example.yandexmaprufat.remote.Right
@@ -15,6 +18,10 @@ import kotlinx.coroutines.withContext
 class MainRepository(private val remoteApi: RemoteApi /*val dao: UserDao*/) {
 
 
+
+     suspend fun getBankList(): List<Bank> {
+        return mapFromBankListResponseDtoToBankList(remoteApi.getBankList().body()!!)
+    }
 
 
     suspend fun getUIState():LatestNewsUiState?{

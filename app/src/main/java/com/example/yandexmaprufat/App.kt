@@ -16,15 +16,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class App : Application() {
 
-    private val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(Interceptor { chain ->
+    private val client: OkHttpClient = OkHttpClient.Builder()/*.addInterceptor(Interceptor { chain ->
         val newRequest: Request = chain.request().newBuilder()
             .addHeader("Authorization", "Bearer subescheator")
             .build()
         chain.proceed(newRequest)
-    }).build()
+    })*/.build()
 
     private val retrofit by lazy {
-        Retrofit.Builder().client(client).baseUrl("https://simplifiedcoding.net/demos/")
+        Retrofit.Builder().client(client).baseUrl("https://api.vtb.goodgenius.ru/")
             .addConverterFactory(GsonConverterFactory.create()).build()}
 
     val mainRepository by lazy{
@@ -34,6 +34,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
+        MapKitFactory.initialize(this)
 
 
 
