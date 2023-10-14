@@ -31,7 +31,7 @@ class FragmentDop : Fragment() {
         binding = FragmentDopBinding.bind(view)
         binding.message.text = "12321321321"
         binding.buttonBack.setOnClickListener {
-            fragmentManager?.popBackStack()
+            /*fragmentManager?.popBackStack()*/
         }
     }
 

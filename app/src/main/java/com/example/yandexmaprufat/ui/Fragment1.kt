@@ -32,7 +32,10 @@ import kotlinx.coroutines.launch
 class Fragment1 : Fragment() {
 
     private lateinit var viewModel: MainViewModel
-    private lateinit var binding: FragmentMainBinding
+
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var mapView: MapView
     private var currentPosition: CameraPosition? = null
     private var currentMapObjects: List<Point>? = null
@@ -113,7 +116,9 @@ class Fragment1 : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -126,10 +131,9 @@ class Fragment1 : Fragment() {
             shPr.savePreferencesString("TOKEN", "$result token ")
         }
 
-        FragmentMainBinding.inflate(layoutInflater)
+       // FragmentMainBinding.inflate(layoutInflater)
 
         MapKitFactory.initialize(context)
-        binding = FragmentMainBinding.bind(view)
 
         mapView = binding.yandexMapView
         mapView.mapWindow.map.addCameraListener(cameraListener)
@@ -151,10 +155,10 @@ class Fragment1 : Fragment() {
         mapView.mapWindow.map.addInputListener(inputListener)
 
         binding.buttonParam.setOnClickListener {
-            fragmentManager?.beginTransaction()
+           /* fragmentManager?.beginTransaction()
                 ?.replace(R.id.container, FragmentDop.newInstance())
                 ?.addToBackStack(null)
-                ?.commit()
+                ?.commit()*/
         }
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
