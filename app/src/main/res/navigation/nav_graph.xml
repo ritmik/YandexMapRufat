@@ -6,7 +6,34 @@
     app:startDestination="@id/mainFragment">
   <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.yandexmaprufat.ui.Fragment1"
+        android:name="com.example.yandexmaprufat.ui.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" />
+  <fragment
+      android:id="@+id/fragmentParam"
+      android:name="com.example.yandexmaprufat.ui.FragmentParam"
+      android:label="fragment_dop"
+      tools:layout="@layout/fragment_param" >
+    <action
+        android:id="@+id/action_fragmentParam_to_favouritesFragment"
+        app:destination="@id/favouritesFragment" />
+    <action
+        android:id="@+id/action_fragmentParam_to_historyFragment"
+        app:destination="@id/historyFragment" />
+  </fragment>
+  <fragment
+      android:id="@+id/bankBranchFragment"
+      android:name="com.example.yandexmaprufat.ui.BankBranchFragment"
+      android:label="fragment_bank_branch"
+      tools:layout="@layout/fragment_bank_branch" />
+  <fragment
+      android:id="@+id/favouritesFragment"
+      android:name="com.example.yandexmaprufat.ui.FavouritesFragment"
+      android:label="fragment_favourites"
+      tools:layout="@layout/fragment_favourites" />
+  <fragment
+      android:id="@+id/historyFragment"
+      android:name="com.example.yandexmaprufat.ui.HistoryFragment"
+      android:label="fragment_history"
+      tools:layout="@layout/fragment_history" />
 </navigation>

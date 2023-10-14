@@ -11,8 +11,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.yandexmaprufat.App
 import com.example.yandexmaprufat.R
 import com.example.yandexmaprufat.data.LatestNewsUiState
 import com.example.yandexmaprufat.databinding.FragmentMainBinding
@@ -29,9 +31,9 @@ import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.launch
 
-class Fragment1 : Fragment() {
+class MainFragment : Fragment() {
 
-    private lateinit var viewModel: MainViewModel
+    val viewModel: MainViewModel by viewModels { MainViewModelFactory((requireActivity().application as App).mainRepository) }
 
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
@@ -75,7 +77,7 @@ class Fragment1 : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("TAGt", "onCreate")
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+
         // TODO: Use the ViewModel
 
         //TestLogDb().apply { testLogDb() }
@@ -116,8 +118,9 @@ class Fragment1 : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        MapKitFactory.setApiKey("796bcd3b-1477-477e-a868-60befe5cd967" )
+        MapKitFactory.initialize(context)
         _binding = FragmentMainBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -131,9 +134,7 @@ class Fragment1 : Fragment() {
             shPr.savePreferencesString("TOKEN", "$result token ")
         }
 
-       // FragmentMainBinding.inflate(layoutInflater)
 
-        MapKitFactory.initialize(context)
 
         mapView = binding.yandexMapView
         mapView.mapWindow.map.addCameraListener(cameraListener)
@@ -154,12 +155,12 @@ class Fragment1 : Fragment() {
         }
         mapView.mapWindow.map.addInputListener(inputListener)
 
-        binding.buttonParam.setOnClickListener {
-           /* fragmentManager?.beginTransaction()
-                ?.replace(R.id.container, FragmentDop.newInstance())
-                ?.addToBackStack(null)
-                ?.commit()*/
-        }
+      /*  binding.buttonParam.setOnClickListener {
+            findNavController().navigate(
+                MainFragmentDirections.actionMainFragmentToFragmentParam()
+            )
+        }*/
+
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
                 viewModel.uiState.collect{
@@ -215,7 +216,7 @@ class Fragment1 : Fragment() {
     }
 
     companion object {
-        fun newInstance() = Fragment1()
+        fun newInstance() = MainFragment()
         private val POINT = Point(55.90536986, 48.95701074)
         private val POSITION = CameraPosition(POINT, 17.0f, 0.0f, 0.0f)
     }
