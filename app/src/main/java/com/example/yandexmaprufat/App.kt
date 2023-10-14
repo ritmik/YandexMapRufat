@@ -1,7 +1,6 @@
 package com.example.yandexmaprufat
 
 import android.app.Application
-import androidx.room.Room
 import com.example.yandexmaprufat.db.AppDatabase
 import com.example.yandexmaprufat.db.AppDatabase2
 import com.yandex.mapkit.MapKitFactory
@@ -22,8 +21,8 @@ class App : Application() {
 
     }
 
-    companion object{
-        var db : AppDatabase? = null
-        var db2 : AppDatabase2? = null
+    companion object {
+        var db: AppDatabase? = null
+        var db2: AppDatabase2? = null
     }
 }
