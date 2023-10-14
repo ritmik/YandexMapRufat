@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <item
+        android:id="@+id/сredit"
+        android:title="Кредиты" />
+
+    <item
+        android:id="@+id/card"
+        android:title="Карты"/>
+
+    <item
+        android:id="@+id/mortgage"
+        android:title="Ипотека" />
+    <item
+        android:id="@+id/car_credit"
+        android:title="Автокредиты"/>
+    <item
+        android:id="@+id/deposits_and_accounts"
+        android:title="Вклады и счета" />
+
+    <item
+        android:id="@+id/investments"
+        android:title="Инвестиции"/>
+
+    <item
+        android:id="@+id/bankBranchFragment"
+        android:title="Онлайн-сервисы" />
+    <item
+        android:id="@+id/payments_and_translations"
+        android:title="Платежи и переводы" />
+
+    <item
+        android:id="@+id/another_services"
+        android:title="Другие услуги"/>
+
+    <item
+        android:id="@+id/privileges"
+        android:title="Привилегия" />
+    <item
+        android:id="@+id/private_banking"
+        android:title="Private Banking" />
+
+
+
+
+</menu>

@@ -11,38 +11,88 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.example.yandexmaprufat.App
 import com.example.yandexmaprufat.R
+import com.example.yandexmaprufat.data.Bank
 import com.example.yandexmaprufat.data.LatestNewsUiState
 import com.example.yandexmaprufat.databinding.FragmentMainBinding
 import com.example.yandexmaprufat.isPermissionGranted
 import com.example.yandexmaprufat.onRequestPermissionsResultCheck
 import com.example.yandexmaprufat.requestPermission
+import com.example.yandexmaprufat.ui.vmfactories.MainViewModelFactory
 import com.example.yandexmaprufat.util.SharedPreferencesProvider
 import com.example.yandexmaprufat.util.showErrorDialog
 import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.directions.driving.DrivingRoute
+import com.yandex.mapkit.directions.driving.DrivingRouter
+import com.yandex.mapkit.directions.driving.DrivingSession
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.*
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
+import com.yandex.runtime.network.NetworkError
 import kotlinx.coroutines.launch
 
-class Fragment1 : Fragment() {
+class MainFragment : Fragment() {
 
-    private lateinit var viewModel: MainViewModel
-    private lateinit var binding: FragmentMainBinding
+    val viewModel: MainViewModel by viewModels { MainViewModelFactory((requireActivity().application as App).mainRepository) }
+
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var mapView: MapView
     private var currentPosition: CameraPosition? = null
+
     private var currentMapObjects: List<Point>? = null
+    private var currentBankObjects: List<Point>? = null
+    val list = mutableListOf<Bank>()
     private val placemarkTapListener = MapObjectTapListener { mapObject, point ->
-        activity?.showToast("Tapped the point (${point.longitude}, ${point.latitude})")
-        //mapObject.isVisible = false
-        //mapObject.parent.remove(mapObject)
-        mapObject.parent.clear()
+
         true
     }
+
+    /////////////////////////////////////////
+    private val drivingRouteListener = object : DrivingSession.DrivingRouteListener {
+        override fun onDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {
+            routes = drivingRoutes
+        }
+
+        override fun onDrivingRoutesError(error: com.yandex.runtime.Error) {
+            when (error) {
+                is NetworkError -> Log.d("drfctgyjh", "onDrivingRoutesError: ")
+                else -> Log.d("drfctgyjh", "onDrivingRoutesError: ")
+            }
+        }
+
+    }
+
+    private var routePoints = emptyList<Point>()
+        set(value) {
+            field = value
+            onRoutePointsUpdated()
+        }
+
+    private var routes = emptyList<DrivingRoute>()
+        set(value) {
+            field = value
+            onRoutesUpdated()
+        }
+
+    private lateinit var drivingRouter: DrivingRouter
+    private var drivingSession: DrivingSession? = null
+    private lateinit var placemarksCollection: MapObjectCollection
+    private lateinit var routesCollection: MapObjectCollection
+
+
+
+
+
+
 
     private val cameraListener = CameraListener { _, pos, _, _ ->
 //        Log.d(
@@ -71,9 +121,6 @@ class Fragment1 : Fragment() {
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("TAGt", "onCreate")
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        // TODO: Use the ViewModel
 
         //TestLogDb().apply { testLogDb() }
 
@@ -113,7 +160,9 @@ class Fragment1 : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_main, container, false)
+
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -126,10 +175,6 @@ class Fragment1 : Fragment() {
             shPr.savePreferencesString("TOKEN", "$result token ")
         }
 
-        FragmentMainBinding.inflate(layoutInflater)
-
-        MapKitFactory.initialize(context)
-        binding = FragmentMainBinding.bind(view)
 
         mapView = binding.yandexMapView
         mapView.mapWindow.map.addCameraListener(cameraListener)
@@ -146,25 +191,43 @@ class Fragment1 : Fragment() {
         } else {
             currentMapObjects?.forEach {
                 setImageOnMap(it)
+
             }
         }
+
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.bankList.flowWithLifecycle(
+                viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED
+            ).collect {
+                it.forEach { uit ->
+                    Log.d("otladkaLela", "onViewCreated: " + uit)
+                    setBankImageOnMap(Point(uit.lat.toDouble(), uit.lon.toDouble()))
+                }
+            }
+        }
+
+
+
+
         mapView.mapWindow.map.addInputListener(inputListener)
 
-        binding.buttonParam.setOnClickListener {
-            fragmentManager?.beginTransaction()
-                ?.replace(R.id.container, FragmentDop.newInstance())
-                ?.addToBackStack(null)
-                ?.commit()
-        }
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
-                viewModel.uiState.collect{
-                    when(it){
+                viewModel.uiState.collect {
+                    when (it) {
                         is LatestNewsUiState.Success -> {
-                            Log.d("TAGt", "collect LatestNewsUiState.Success size = ${it.news.size}")
+                            Log.d(
+                                "TAGt",
+                                "collect LatestNewsUiState.Success size = ${it.news.size}"
+                            )
                         }
+
                         is LatestNewsUiState.Error -> {
-                            Log.d("TAGt", "collect111 LatestNewsUiState.Error message = ${it.exception.message}")
+                            Log.d(
+                                "TAGt",
+                                "collect111 LatestNewsUiState.Error message = ${it.exception.message}"
+                            )
                             activity?.showErrorDialog(it.exception.message)
                         }
                     }
@@ -196,7 +259,7 @@ class Fragment1 : Fragment() {
     }
 
     private fun setImageOnMap(point: Point) {
-        val imageProvider = ImageProvider.fromResource(context, R.drawable.ic_dollar_pin)
+        val imageProvider = ImageProvider.fromResource(context, R.drawable.here_icon)
         val placemarkObject = mapView.map.mapObjects.addPlacemark().apply {
             geometry = point
             setIcon(imageProvider)
@@ -206,12 +269,23 @@ class Fragment1 : Fragment() {
         //placemarkObject.removeTapListener(placemarkTapListener)
     }
 
+    private fun setBankImageOnMap(point: Point) {
+        val imageProvider = ImageProvider.fromResource(context, R.drawable.ic_dollar_pin)
+        val placemarkObject = mapView.map.mapObjects.addPlacemark().apply {
+            geometry = point
+            setIcon(imageProvider)
+        }
+        placemarkObject.addTapListener(placemarkTapListener)
+        currentBankObjects = currentBankObjects.orEmpty() + point
+        //placemarkObject.removeTapListener(placemarkTapListener)
+    }
+
     private fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
         Toast.makeText(this, message, duration).show()
     }
 
     companion object {
-        fun newInstance() = Fragment1()
+        fun newInstance() = MainFragment()
         private val POINT = Point(55.90536986, 48.95701074)
         private val POSITION = CameraPosition(POINT, 17.0f, 0.0f, 0.0f)
     }

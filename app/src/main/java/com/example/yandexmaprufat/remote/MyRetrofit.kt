@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class MyRetrofit() {
-
+/*
     val api: RemoteApi
 
     init {
@@ -28,11 +28,8 @@ class MyRetrofit() {
 
     companion object {
         private var instanceLink: MyRetrofit? = null
-        fun getInstance(context: Context): MyRetrofit {
-            if (instanceLink == null) instanceLink = MyRetrofit()
-            return instanceLink as MyRetrofit
-        }
+
 
         private const val URL_TEST = "https://simplifiedcoding.net/demos/"
-    }
+    }*/
 }
